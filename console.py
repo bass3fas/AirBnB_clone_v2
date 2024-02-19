@@ -120,7 +120,7 @@ class HBNBCommand(cmd.Cmd):
             return
         args_list = args.split(' ')
         class_name = args_list[0]
-        elif class_name not in HBNBCommand.classes:
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
         """preparing dectionary for parameters"""
@@ -132,10 +132,24 @@ class HBNBCommand(cmd.Cmd):
                 return
             key = param[0]
             value = param[1]
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1].replace('_', ' ')
+            elif '.' in value:
+                try:
+                    value = float(value)
+                except ValueError:
+                    print("**invalid float value**")
+                    return
+                else:
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        print("**invalid integer value**")
+                        return
             kwargs[key] = value
 
         new_instance = HBNBCommand.classes[class_name](**kwargs)
-        new_instance.save()
+        storage.save()
         print(new_instance.id)
         storage.save()
 
