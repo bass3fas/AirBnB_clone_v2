@@ -1,20 +1,22 @@
 #!/usr/bin/python3
-"""This module defines a base class for all models in our hbnb clone"""
-import uuid
-from datetime import datetime
-from models import storage
+"""This is the base model class for AirBnB"""
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Integer, DateTime
+import uuid
+import models
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, DateTime
 
 
 Base = declarative_base()
 
-class BaseModel:
-    """A base class for all hbnb models"""
 
-    id = Column(String(60), nullable=False, primary_key=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+class BaseModel:
+    """This class will defines all common attributes/methods
+    for other classes
+    """
+    id = Column(String(60), unique=True, nullable=False, primary_key=True)
+    created_at = Column(DateTime, nullable=False, default=(datetime.utcnow()))
+    updated_at = Column(DateTime, nullable=False, default=(datetime.utcnow()))
 
     def __init__(self, *args, **kwargs):
         """Instantiation of base model class
@@ -43,15 +45,24 @@ class BaseModel:
             self.created_at = self.updated_at = datetime.now()
 
     def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        """returns a string
+        Return:
+            returns a string of class name, id, and dictionary
+        """
+        return "[{}] ({}) {}".format(
+            type(self).__name__, self.id, self.__dict__)
+
+    def __repr__(self):
+        """return a string representaion
+        """
+        return self.__str__()
 
     def save(self):
-        """Updates updated_at with current time when instance is changed"""
+        """updates the public instance attribute updated_at to current
+        """
         self.updated_at = datetime.now()
-        storage.new(self)
-        storage.save()
+        models.storage.new(self)
+        models.storage.save()
 
     def to_dict(self):
         """creates dictionary of the class  and returns
@@ -67,5 +78,6 @@ class BaseModel:
         return my_dict
 
     def delete(self):
-        """delete the current instance from the storage"""
-        storage.delete(self)
+        """ delete object
+        """
+        models.storage.delete(self)
